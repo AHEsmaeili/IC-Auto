@@ -5,3 +5,5 @@
 * A processing pipeline of Python packages was utilized to analyze behavioral data obtained in Intellicage.
 
 * This allows for identification of novel behavioral sequences that were not apparent in manual analysis.
+
+![alt text](https://github.com/AHEsmaeili/VA.tif "Visual Abstract")
