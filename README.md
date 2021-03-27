@@ -6,4 +6,4 @@
 
 * This allows for identification of novel behavioral sequences that were not apparent in manual analysis.
 
-![alt text](https://github.com/AHEsmaeili/VA.tif "Visual Abstract")
+![Visual abstract](https://github.com/AHEsmaeili/VA.png "Visual Abstract")
