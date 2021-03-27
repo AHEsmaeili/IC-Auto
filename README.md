@@ -6,7 +6,7 @@
 
 
 ## Introduction
-* IntelliCage is a novel system for conducting automated and long-term behavioral test on behaving rodents.
+* IntelliCage is a modern system for conducting automated and long-term behavioral test on behaving rodents.
 
 * A processing pipeline of Python packages was utilized to analyze behavioral data obtained in Intellicage.
 
