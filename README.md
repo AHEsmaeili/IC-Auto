@@ -1,4 +1,6 @@
-# IC-Auto
+# IntelliCage automated analysis
+
+![](https://img.shields.io/github/issues/AHEsmaeili/IC-Auto?style=flat-square)
 
 * IntelliCage is a novel system for conducting automated and long-term behavioral test on behaving rodents.
 
