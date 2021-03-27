@@ -6,4 +6,4 @@
 
 * This allows for identification of novel behavioral sequences that were not apparent in manual analysis.
 
-![Visual abstract](https://github.com/AHEsmaeili/IC-Auto/VA.tif "Visual Abstract")
+![Visual abstract](https://github.com/AHEsmaeili/IC-Auto/VA.png "Visual Abstract")
