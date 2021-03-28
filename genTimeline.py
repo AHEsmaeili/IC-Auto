@@ -1,7 +1,5 @@
-from datetime import datetime, timedelta
-import pymice as pm
-import numpy as np
-import pytz
+from datetime import timedelta
+
 
 
 def gtimeline(data, name,filedir):
