@@ -14,6 +14,16 @@
 
 ![Scheme of the analysis](./VA.svg)
 
+## Dependencies
+------------
+The following packages are required for using the analysis scripts
+
+* NumPy
+* Pandas
+* PyMICE
+* Pingouin
+* Matplotlib
+
 ## Usage
 * IntelliCage archives for running the code are available upon reasonable request.
 
