@@ -11,15 +11,16 @@
 ![Issues](https://img.shields.io/github/issues/AHEsmaeili/IC-Auto?style=plastic)
 ![Forks](https://img.shields.io/github/forks/AHEsmaeili/IC-Auto)
 ![License](https://img.shields.io/github/license/AHEsmaeili/IC-Auto)
+
 ## Dependencies
 The following packages are required for using the analysis scripts
 
-* NumPy
-* Pandas
 * PyMICE
 * Pingouin
+* NumPy
+* Pandas
 * Matplotlib
-
+ 
 ## Usage
 * IntelliCage archives for running the code are available upon reasonable request.
 
