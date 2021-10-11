@@ -7,14 +7,11 @@
 
 * This allows for identification of novel behavioral sequences that were not apparent in manual analysis.
 
+![Scheme of the analysis](./VA.svg)
 ![Issues](https://img.shields.io/github/issues/AHEsmaeili/IC-Auto?style=plastic)
 ![Forks](https://img.shields.io/github/forks/AHEsmaeili/IC-Auto)
 ![License](https://img.shields.io/github/license/AHEsmaeili/IC-Auto)
-
-![Scheme of the analysis](./VA.svg)
-
 ## Dependencies
-------------
 The following packages are required for using the analysis scripts
 
 * NumPy
