@@ -20,27 +20,29 @@ if __name__ == '__main__':
     
     nameLists = [None] * len(zipNames)
     filePhases = nameLists.copy()
-    aniDicts = nameLists.copy()
-    
+    visDurs = nameLists.copy()
+    visNums = nameLists.copy()
+
     
     print('Analyzing files:\n')
 
     for zipind, zipname in enumerate(zipNames):
         
         print(zipname + '\n')
-        nameLists[zipind], filePhases[zipind], aniDicts[zipind] = analysisIC.analyze(zipname, myDir)
+        nameLists[zipind], filePhases[zipind], visDurs[zipind], visNums[zipind] = analysisIC.analyze(zipname, myDir)
     
     print('Aggregating files\n')
-    aggDict, phaseDict = aggAnalyze.aggregate(aniDicts, filePhases, nameLists)
-    
+    aggNum, phaseDict = aggAnalyze.aggregate(visNums, filePhases, nameLists)
+    aggDur, _ = aggAnalyze.aggregate(visDurs, filePhases, nameLists)
+
     print('Running statistical tests\n')
-    corrDict, meanCorrs, compDict, betDict, phenotype, cStats = aggStats.getstats(aggDict)
+    corrDict, meanCorrs, compDict, anovas, posthocs, halfs, anova_pars = aggStats.getstats(aggDur, aggNum)
     
     print('Creating Graphs\n')
-    aggPlot.visualize(aggDict, betDict, meanCorrs, cStats)
+    aggPlot.visualize(aggDur, aggNum, meanCorrs, posthocs, halfs, anova_pars)
     
     print('Exporting results to Excel\n')
-    aggExport.export(aggDict, compDict, betDict, phenotype)
+    aggExport.export(aggDur, aggNum, compDict, anovas, posthocs, halfs, anova_pars)
     
     print('Finished!\n\nExiting...')
     time.sleep(3)

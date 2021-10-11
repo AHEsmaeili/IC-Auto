@@ -1,8 +1,10 @@
 from datetime import timedelta
 
 
+# Function to create IntelliCage timeline (.ini) files
+# These files will be created in the same location as the IC archives
 
-def gtimeline(data, name,filedir):
+def gtimeline(data, name, filedir):
 
     # Duration of the experiment file
     start = data.getStart().replace(hour = 8, minute = 0, second = 0, microsecond = 0, tzinfo = None)
@@ -15,7 +17,7 @@ def gtimeline(data, name,filedir):
     ziptimes = zip(timeranges[0:-1],timeranges[1:])
 
     # Writing to .ini file
-    f = open(name[:name.rfind(".")] + '.ini', 'w+')
+    f = open(filedir + name[:name.rfind(".")] + '.ini', 'w+')
     for ind, val in enumerate(ziptimes):
         if ind % 2 == 0:
             pind = ind//2 + 1

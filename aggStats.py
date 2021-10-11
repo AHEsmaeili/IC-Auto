@@ -1,14 +1,12 @@
 import numpy as np
 import pandas as pd
 import pingouin as pg
-from scipy import stats
 
 
-
-def getstats(aggDict):
+def getstats(aggDur, aggNum):
     
-    animals = list(aggDict['0NP']['sub_id'])
-    cols = list(aggDict['0NP'].columns.values)
+    animals = list(aggNum['0NP']['sub_id'])
+    cols = list(aggNum['0NP'].columns.values)
     phaseCols = cols[3:19] # Getting phase names
 
     sequences = ['0NP', '1NP', '(0,1,~) D', '(0,-1,~)']
@@ -21,43 +19,48 @@ def getstats(aggDict):
     corrDict = {}
     meanCorrs = {} # Just the mean
 
-    for kind, kval in enumerate(sequences):
-        corrDict[kval] = {}
-        meanCorrs[kval] = 0
-        df = aggDict[kval].set_index('sub_id')
+    for key in sequences:
+        corrDict[key] = {}
+        meanCorrs[key] = 0
+        df = aggNum[key].set_index('sub_id')
         for animal in animals:
-            corRes = pg.corr(mxl[kval].loc[animal, '1L':'8D'].astype('float64'),
+            corRes = pg.corr(mxl[key].loc[animal, '1L':'8D'].astype('float64'),
                              df.loc[animal, '1L':'8D'].astype('float64'), method='pearson')
-            corrDict[kval][animal] = corRes.loc['pearson']
-            meanCorrs[kval] += corRes.loc['pearson']['r'] / len(animals)
+            corrDict[key][animal] = corRes.loc['pearson']
+            meanCorrs[key] += corRes.loc['pearson']['r'] / len(animals)
 
     # For export
     compDict = {}
-    for ind, sheetname in enumerate(sequences):
-        compDict[sheetname] = pd.DataFrame.from_dict(corrDict[sheetname]).T
+    for key in sequences:
+        compDict[key] = pd.DataFrame.from_dict(corrDict[key]).T
 
-    # Between subjects pairwise t-tests
-    betDict = {'treat': {}, 'phen': {}}
-    for bet in betDict.keys():
-        for key in sequences:
-            
-            # Converting to long format
-            df = aggDict[key].loc[:, :'8D'].melt(id_vars=['sub_id', 'treat', 'phen'], value_vars=phaseCols,
-                                                 var_name='phase', value_name='dv')
-            df['dv'] = pd.to_numeric(df['dv'])
-            df = pg.pairwise_ttests(data=df, subject='sub_id', dv='dv', within='phase',
-                                    between=[bet], return_desc=True).round(6)
-            betDict[bet][key] = df
-            
-    # Wilcoxon for impulsive sequence, for phases 6D:7L
-    df = aggDict['(0,-1,~)'].loc[:, :'8D']
-    phenotype = {'epi': df[df.phen == 'epi'], 'non': df[df.phen == 'non']}
-    for phenkey, phenval in phenotype.items():
-        w, p = stats.wilcoxon(phenval.loc[:, '6D'], phenval.loc[:, '7L'], mode='approx')
-        phenotype[phenkey] = pd.DataFrame.from_dict({'w': [w], 'p': [p]})
 
-    # Descriptive stats for self-control
-    cDrink = aggDict['(0,1,~) D'].loc[:, :'8D']
-    cStats = [(cDrink.mean(axis=0), cDrink.sem(axis=0))]
+    anova_pars = [('treat', 'control', 'phen'), ('phen', 'epi', 'treat')]
+    sequences.append('Other')
+    days = [phase for phase in phaseCols if 'L' in phase]
+    nights = [phase for phase in phaseCols if 'D' in phase]
+    halfs = ((cols[:3]+days, 'Days', days), (cols[:3]+nights, 'Nights', nights))
+    
+    # Running between subjects mixed-Anovas and pairwise t-tests for light/dark phases separately     
+    anovas = {}    
+    posthocs = {}
+    
+    for half in halfs:
+        aovs = {'treat':{}, 'phen':{}}
+        posts = {'treat':{}, 'phen':{}}
+        
+        for par in anova_pars:
+            for key in sequences:
+                seq = aggNum[key]
+                df = seq[seq[par[0]] == par[1]].loc[:, half[0]].melt(id_vars = ['sub_id', 'treat', 'phen'], value_vars = half[2], var_name = 'phase', value_name = 'dv')
+                df['dv'] = pd.to_numeric(df['dv'])
+                aovs[par[2]][key] = pg.mixed_anova(data=df, subject = 'sub_id', dv='dv', within = 'phase', between = par[2])
 
-    return corrDict, meanCorrs, compDict, betDict, phenotype, cStats
+                posts[par[2]][key] = pg.pairwise_ttests(data = df, subject = 'sub_id', dv = 'dv', within = 'phase',
+                                           between = [par[2]], return_desc = True).round(6)
+        
+        posthocs[half[1]] = posts
+        anovas[half[1]] = aovs
+
+
+    return corrDict, meanCorrs, compDict, anovas, posthocs, halfs, anova_pars

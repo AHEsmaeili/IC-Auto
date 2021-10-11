@@ -47,7 +47,7 @@ def analyze(filename, filedir):
     
     # Loading IC archives introduces a bottleneck, so generate timelines
     # during each analysis
-    if filename[:-4]+'.ini' not in os.listdir(os.getcwd()):
+    if filename[:-4]+'.ini' not in os.listdir(filedir):
         print('\t\tTimeline not found, generating...\n')
         genTimeline.gtimeline(data, filename, filedir)
     else:
@@ -60,61 +60,76 @@ def analyze(filename, filedir):
     
     Animals = list(data.getAnimal())
 
-    aniDict = {}
-    
+    visDurs = {} # Dictionary for percentage of mean duration of visits for each animal and sequence
+    visNums = {} # Dictionary for percentage of number of visits for each animal and sequence
     
     for animal in Animals:
-        
-        if animal == 'B6K6': # Subject B6K6 is omitted from the analysis
+        if animal == 'B6K6':
             continue
         
-        stratDict = {}  # Results dict.
-        traitList = [animal, traitDict[animal][0], traitDict[animal][1]] # A list of trait strings
+        meanDict = {}
+        numDict = {}
+
+        traitList = [animal, traitDict[animal][0], traitDict[animal][1]]
 
         for key in stratKeys:
-            stratDict[key] = np.zeros((len(PHASES),)) # Initializing sequences
+            meanDict[key] = np.zeros((len(PHASES),))
+            numDict[key] = np.zeros((len(PHASES),))
             
         for ind, phase in enumerate(PHASES):
 
             start, end = timeline.getTimeBounds(phase)
             phasevisits = data.getVisits(mice = animal, start = start, end = end)
-            stratDict['Vis'][ind] = len(phasevisits)
+            numDict['Vis'][ind] = len(phasevisits)
 
-            # Assignign to each sequence based on NP number and SideCondition
+            # Identifying sequences based on the side condition of nosepokes
             for visit in phasevisits:
+                
+                visDur = visit.Duration.total_seconds()
+                meanDict['Vis'][ind] += visDur
 
                 if len(visit.Nosepokes) == 0:
-                    stratDict['0NP'][ind] += 1
+                    meanDict['0NP'][ind] += visDur
+                    numDict['0NP'][ind] += 1
 
                 elif len(visit.Nosepokes) == 1:
                     
                     if visit.Nosepokes[0].SideCondition == -1:
-                        stratDict['Other'][ind] += 1
+                        meanDict['Other'][ind] += visDur
+                        numDict['Other'][ind] += 1
                     else:
-                        stratDict['1NP'][ind] += 1
+                        meanDict['1NP'][ind] += visDur
+                        numDict['1NP'][ind] += 1
 
                 elif len(visit.Nosepokes) == 2:
 
                     if visit.Nosepokes[0].SideCondition == 0:
 
                         if visit.Nosepokes[1].SideCondition == 0:
-
-                            stratDict['Other'][ind] += 1
+                            
+                                meanDict['Other'][ind] += visDur
+                                numDict['Other'][ind] += 1
 
                         elif visit.Nosepokes[1].SideCondition == 1:
 
                             if visit.LickNumber != 0:
-                                stratDict['(0,1,~) D'][ind] += 1
+                                meanDict['(0,1,~) D'][ind] += visDur
+                                numDict['(0,1,~) D'][ind] += 1
+
                             else:
-                                stratDict['Other'][ind] += 1
+                                meanDict['Other'][ind] += visDur
+                                numDict['Other'][ind] += 1
 
                         elif visit.Nosepokes[1].SideCondition == -1:
-                            stratDict['(0,-1,~)'][ind] += 1
+                                meanDict['(0,-1,~)'][ind] += visDur
+                                numDict['(0,-1,~)'][ind] += 1
+
                         else:
                             pass
 
                     else:
-                        stratDict['Other'][ind] += 1
+                        meanDict['Other'][ind] += visDur
+                        numDict['Other'][ind] += 1
 
                 elif len(visit.Nosepokes) >= 3:
 
@@ -125,47 +140,66 @@ def analyze(filename, filedir):
                             if visit.Nosepokes[2].SideCondition == 1:
 
                                 if visit.LickNumber != 0:
-                                    stratDict['Other'][ind] += 1
+                                    meanDict['Other'][ind] += visDur
+                                    numDict['Other'][ind] += 1
+
                                 else:
-                                    stratDict['Other'][ind] += 1
+                                    meanDict['Other'][ind] += visDur
+                                    numDict['Other'][ind] += 1
 
                             elif visit.Nosepokes[2].SideCondition == -1:
-                                stratDict['Other'][ind] += 1
+                                meanDict['Other'][ind] += visDur
+                                numDict['Other'][ind] += 1
 
                             elif visit.Nosepokes[2].SideCondition == 0:
-                                stratDict['Other'][ind] += 1 
+                                meanDict['Other'][ind] += visDur 
+                                numDict['Other'][ind] += 1
+
                             else:
                                 pass
 
                         elif visit.Nosepokes[1].SideCondition == -1:
-                            stratDict['(0,-1,~)'][ind] += 1 
+                            meanDict['(0,-1,~)'][ind] += visDur 
+                            numDict['(0,-1,~)'][ind] += 1
 
                         elif visit.Nosepokes[1].SideCondition == 1:
                             if visit.LickNumber != 0:
-                                stratDict['(0,1,~) D'][ind] += 1
+                                meanDict['(0,1,~) D'][ind] += visDur
+                                numDict['(0,1,~) D'][ind] += 1
+
                             else:
-                                stratDict['Other'][ind] += 1
+                                meanDict['Other'][ind] += visDur
+                                numDict['Other'][ind] += 1
                     else:
-                        stratDict['Other'][ind] += 1
+                        meanDict['Other'][ind] += visDur
+                        numDict['Other'][ind] += 1
                 else:
                     pass
 
-        # Converting sequences to %visits, and adding the trait strings
-        for key in stratDict:
-            if key not in ['visRatio', 'Vis']:
-                stratDict[key] /= stratDict['Vis']*0.01
-                stratDict['visRatio'] += stratDict[key] 
-                stratDict[key] = traitList + list(stratDict[key])
+        # Calculating percentages for mean durations and numbers of visits
+        for key in meanDict:
+            if key not in ['visRatio', 'Vis', 'TotalDuration', 'SumMeans']:
+                meanDict[key] = np.divide(meanDict[key], numDict[key],
+                                           out=np.zeros_like(meanDict[key]), where=numDict[key]!=0)
+                meanDict['visRatio'] += meanDict[key]
+                meanDict[key] = traitList + list(meanDict[key])            
+                numDict[key] /= numDict['Vis']*0.01
+                numDict['visRatio'] += numDict[key] 
+                numDict[key] = traitList + list(numDict[key])
 
-        stratDict['Vis'] = traitList + list(stratDict['Vis'])
-        stratDict['visRatio'] = traitList + list(stratDict['visRatio'])
-
-        aniDict[animal] = stratDict
+        meanDict['TotalDuration'] = traitList + list(meanDict['Vis'])
+        meanDict['SumMeans'] = traitList + list(meanDict['visRatio'])
+        numDict['Vis'] = traitList + list(numDict['Vis'])
+        numDict['visRatio'] = traitList + list(numDict['visRatio'])
+        meanDict.pop('Vis')
+        meanDict.pop('visRatio')
+        visDurs[animal] =  meanDict
+        visNums[animal] = numDict
     
-    # Header info for dataframes and spreadsheets
-    phaseDict = {}
-    PHASES = ['sub_id', 'treat', 'phen'] + PHASES
-    for ind, val in enumerate(PHASES):
-        phaseDict[ind] = PHASES[ind]
+    # Dictionary of phases for generating dataframes and spreadsheets
+    phasedict = {}
+    PHASES =  ['sub_id', 'treat', 'phen'] + PHASES
+    for ind,val in enumerate(PHASES):
+        phasedict[ind]= PHASES[ind]
 
-    return Animals, phaseDict, aniDict
+    return Animals, phasedict, visDurs, visNums

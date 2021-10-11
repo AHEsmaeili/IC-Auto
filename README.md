@@ -12,7 +12,7 @@
 
 * This allows for identification of novel behavioral sequences that were not apparent in manual analysis.
 
-![Scheme of the analysis](./VA.png)
+![Scheme of the analysis](./VA.svg)
 
 ## Usage
 * IntelliCage archives for running the code are available upon reasonable request.
