@@ -13,7 +13,7 @@
 ![License](https://img.shields.io/github/license/AHEsmaeili/IC-Auto)
 
 ## Dependencies
-The following packages are required for using the analysis scripts
+The following packages are required for using the analysis scripts:
 
 * PyMICE
 * Pingouin
@@ -21,7 +21,7 @@ The following packages are required for using the analysis scripts
 * Pandas
 * Matplotlib
  
-## Usage
+## Experimental data
 * IntelliCage archives for running the code are available upon reasonable request.
 
 ## Reference
