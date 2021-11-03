@@ -25,4 +25,4 @@ The following packages are required for using the analysis scripts:
 * IntelliCage archives for running the code are available upon reasonable request.
 
 ## Reference
-* Esmaeili, A., Antonova, A., Sitnikova, E., & Smirnov, K. (2021). Whisker trimming during infanthood modifies the development of spike-wave discharges and behavioral sequences in IntelliCage impulsivity paradigm in adult WAG/Rij rats. *Behavioural Brain Research*
+* Esmaeili, A., Antonova, A., Sitnikova, E., & Smirnov, K. (2021). Whisker trimming during infanthood modifies the development of spike-wave discharges and behavioral sequences in IntelliCage impulsivity paradigm in adult WAG/Rij rats. Behavioural brain research, 113627. Advance online publication. https://doi.org/10.1016/j.bbr.2021.113627
